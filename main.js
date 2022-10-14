@@ -34,25 +34,19 @@ async function saveToFile(users) {
 
 async function saveJsonFile(users) {
   // Write to JSON and outputFile
-  //make it look like an objects which the header values as keys
-  let json = "{\n  ";
+
   rl.on("close", () => {
-    for (let i = 1; i < users.length; i++) {
-      json += `"${i}": {\n\t`;
-      for (let value = 0; value < users[i].length; value++) {
-        json += `"${users[0][value]}": "${users[i][value]}"`;
-        if (value !== users[i].length - 1) {
-          json += ",\n\t";
-        }
-      }
-      if (i !== users.length - 1) {
-        json += "\n  },\n  ";
-      } else {
-        json += "\n  }\n";
-      }
-    }
-    json += "}";
-    fs.writeFileSync("outputFile.json", json);
+    const [keys, ...values] = users;
+    const json = values.map((row) => {
+      return {
+        [row[0]]: keys.reduce(
+          (acc, key, index) => ((acc[key] = row[index]), acc),
+          {}
+        ),
+      };
+    });
+
+    fs.writeFileSync("outputFile.json", JSON.stringify(json));
   });
 }
 
